@@ -25,7 +25,6 @@
             padding: 0 20px;
         }
 
-        /* Header */
         .header {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
@@ -84,7 +83,6 @@
             font-size: 0.875rem;
         }
 
-        /* Main Content */
         .main {
             padding: 40px 0;
         }
@@ -129,7 +127,6 @@
             transform: translateY(-1px);
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -167,7 +164,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Workflow Cards */
         .workflow-section {
             position: relative;
             margin-bottom: 60px;
@@ -253,7 +249,6 @@
             line-height: 1.5;
         }
 
-        /* Dotted connections */
         .workflow-connection {
             position: absolute;
             border: 2px dotted #cbd5e0;
@@ -276,7 +271,6 @@
             transform: translateY(-50%);
         }
 
-        /* Progress Section */
         .progress-section {
             background: white;
             border-radius: 16px;
@@ -320,7 +314,6 @@
             text-align: right;
         }
 
-        /* Recent Activity */
         .activity-section {
             background: white;
             border-radius: 16px;
@@ -376,7 +369,6 @@
             color: #4a5568;
         }
 
-        /* Floating Action Button */
         .fab {
             position: fixed;
             bottom: 24px;
@@ -421,6 +413,7 @@
             }
         }
     </style>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
     <header class="header">
@@ -433,9 +426,8 @@
                     <a href="#" class="nav-link">Progress</a>
                     <a href="#" class="nav-link">Settings</a>
                 </div>
-                <div class="user-menu">
-                    <span style="font-size: 0.875rem; color: #4a5568;">Sarah Johnson</span>
-                    <div class="avatar">S</div>
+                <div class="user-menu" id="userMenu">
+                    <button id="loginBtn" class="cta-button" style="padding: 6px 18px; font-size: 0.9rem;">Log In</button>
                 </div>
             </nav>
         </div>
@@ -555,9 +547,127 @@
         </div>
     </main>
 
-    <button class="fab" onclick="quickStart()">+</button>
+    <!-- Breathing Modal -->
+    <div id="breathingModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(30,32,44,0.7);z-index:2000;align-items:center;justify-content:center;">
+      <div style="background:white;padding:32px 24px;border-radius:16px;max-width:350px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.2);">
+        <h2 style="font-size:1.5rem;font-weight:600;margin-bottom:12px;">Breathing Exercise</h2>
+        <div id="breathingGuide" style="font-size:2rem;margin:24px 0;">Ready?</div>
+        <button class="cta-button" onclick="startBreathingExercise()">Start</button>
+        <button class="cta-button" style="background:#e2e8f0;color:#1a202c;margin-left:8px;" onclick="closeBreathingModal()">Close</button>
+      </div>
+    </div>
+
+    <!-- Journal Modal -->
+    <div id="journalModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(30,32,44,0.7);z-index:2000;align-items:center;justify-content:center;">
+      <div style="background:white;padding:32px 24px;border-radius:16px;max-width:400px;width:90vw;box-shadow:0 8px 24px rgba(0,0,0,0.2);">
+        <h2 style="font-size:1.5rem;font-weight:600;margin-bottom:12px;">Private Journal</h2>
+        <textarea id="journalText" rows="8" style="width:100%;padding:12px;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:16px;"></textarea>
+        <div style="display:flex;justify-content:space-between;">
+          <button class="cta-button" onclick="saveJournal()">Save</button>
+          <button class="cta-button" style="background:#e2e8f0;color:#1a202c;" onclick="closeJournalModal()">Close</button>
+        </div>
+        <div id="journalSavedMsg" style="color:#10b981;font-size:0.9rem;margin-top:8px;display:none;">Saved!</div>
+      </div>
+    </div>
+
+    <button class="fab" onclick="openJournalModal()">+</button>
 
     <script>
+        // --- Netlify Identity: Login/Logout ---
+        netlifyIdentity.on('init', user => updateUserUI(user));
+        netlifyIdentity.on('login', user => { netlifyIdentity.close(); updateUserUI(user); });
+        netlifyIdentity.on('logout', () => updateUserUI(null));
+        document.getElementById('loginBtn').onclick = () => {
+            if (netlifyIdentity.currentUser()) {
+                netlifyIdentity.logout();
+            } else {
+                netlifyIdentity.open('login');
+            }
+        };
+        function updateUserUI(user) {
+            const userMenu = document.getElementById('userMenu');
+            if (user) {
+                userMenu.innerHTML = `<span style="font-size: 0.875rem; color: #4a5568;">${user.user_metadata.full_name || user.email}</span>
+                <div class="avatar">${(user.user_metadata.full_name||user.email)[0].toUpperCase()}</div>
+                <button id="loginBtn" class="cta-button" style="padding: 6px 18px; font-size: 0.9rem;">Log Out</button>`;
+                document.getElementById('loginBtn').onclick = () => netlifyIdentity.logout();
+            } else {
+                userMenu.innerHTML = `<button id="loginBtn" class="cta-button" style="padding: 6px 18px; font-size: 0.9rem;">Log In</button>`;
+                document.getElementById('loginBtn').onclick = () => netlifyIdentity.open('login');
+            }
+        }
+        netlifyIdentity.init();
+
+        // --- Breathing Modal Logic ---
+        function startBreathing() {
+            document.getElementById('breathingModal').style.display = 'flex';
+            document.getElementById('breathingGuide').textContent = 'Ready?';
+        }
+        function closeBreathingModal() {
+            document.getElementById('breathingModal').style.display = 'none';
+            clearTimeout(window.breathingInterval);
+            document.getElementById('breathingGuide').textContent = 'Ready?';
+        }
+        function startBreathingExercise() {
+            const guide = document.getElementById('breathingGuide');
+            let steps = [
+                {text: "Inhale... 1", duration: 1000},
+                {text: "Inhale... 2", duration: 1000},
+                {text: "Inhale... 3", duration: 1000},
+                {text: "Inhale... 4", duration: 1000},
+                {text: "Hold... 1", duration: 1000},
+                {text: "Hold... 2", duration: 1000},
+                {text: "Hold... 3", duration: 1000},
+                {text: "Hold... 4", duration: 1000},
+                {text: "Hold... 5", duration: 1000},
+                {text: "Hold... 6", duration: 1000},
+                {text: "Hold... 7", duration: 1000},
+                {text: "Exhale... 1", duration: 1000},
+                {text: "Exhale... 2", duration: 1000},
+                {text: "Exhale... 3", duration: 1000},
+                {text: "Exhale... 4", duration: 1000},
+                {text: "Exhale... 5", duration: 1000},
+                {text: "Exhale... 6", duration: 1000},
+                {text: "Exhale... 7", duration: 1000},
+                {text: "Exhale... 8", duration: 1000},
+                {text: "Done! Breathe normally.", duration: 2000}
+            ];
+            let i = 0;
+            clearTimeout(window.breathingInterval);
+            function nextStep() {
+                if (i < steps.length) {
+                    guide.textContent = steps[i].text;
+                    window.breathingInterval = setTimeout(nextStep, steps[i].duration);
+                    i++;
+                } else {
+                    guide.textContent = 'Ready?';
+                }
+            }
+            nextStep();
+        }
+
+        // --- Journal Modal Logic ---
+        function openJournalModal() {
+            if (!netlifyIdentity.currentUser()) {
+                showToast("Please log in to use your private journal.");
+                return;
+            }
+            document.getElementById('journalModal').style.display = 'flex';
+            const email = netlifyIdentity.currentUser().email;
+            document.getElementById('journalText').value = localStorage.getItem('journal_' + email) || '';
+            document.getElementById('journalSavedMsg').style.display = 'none';
+        }
+        function closeJournalModal() {
+            document.getElementById('journalModal').style.display = 'none';
+        }
+        function saveJournal() {
+            const email = netlifyIdentity.currentUser().email;
+            localStorage.setItem('journal_' + email, document.getElementById('journalText').value);
+            document.getElementById('journalSavedMsg').style.display = 'block';
+            setTimeout(() => document.getElementById('journalSavedMsg').style.display = 'none', 2000);
+        }
+
+        // --- Toast logic (already in your code) ---
         function startSession() {
             showToast("Starting your mindfulness session...");
         }
@@ -566,16 +676,8 @@
             showToast("Loading guided meditation...");
         }
 
-        function startBreathing() {
-            showToast("Preparing breathing exercise...");
-        }
-
         function startSoundscape() {
             showToast("Opening nature soundscapes...");
-        }
-
-        function quickStart() {
-            showToast("Quick session starting...");
         }
 
         function showToast(message) {
@@ -608,7 +710,6 @@
             }, 3000);
         }
 
-        // Animate progress bar on load
         window.addEventListener('load', () => {
             const progressBar = document.querySelector('.progress-bar');
             setTimeout(() => {
@@ -618,3 +719,4 @@
     </script>
 </body>
 </html>
+
