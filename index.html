@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful - Your Meditation Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: #1a202c;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #2d3748;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        /* Main Content */
+        .main {
+            padding: 40px 0;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #4a5568;
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            background: #1a202c;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            background: #2d3748;
+            transform: translateY(-1px);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Workflow Cards */
+        .workflow-section {
+            position: relative;
+            margin-bottom: 60px;
+        }
+
+        .workflow-cards {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            min-height: 400px;
+        }
+
+        .workflow-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            min-width: 200px;
+        }
+
+        .workflow-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .workflow-card.meditation {
+            background: linear-gradient(135deg, #fef7ff 0%, #f3e8ff 100%);
+            border-color: #e9d5ff;
+        }
+
+        .workflow-card.breathing {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-color: #bae6fd;
+        }
+
+        .workflow-card.soundscape {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-color: #bbf7d0;
+        }
+
+        .workflow-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+        }
+
+        .meditation .workflow-icon {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .breathing .workflow-icon {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .soundscape .workflow-icon {
+            background: #10b981;
+            color: white;
+        }
+
+        .workflow-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .workflow-description {
+            color: #4a5568;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        /* Dotted connections */
+        .workflow-connection {
+            position: absolute;
+            border: 2px dotted #cbd5e0;
+            z-index: 1;
+        }
+
+        .connection-1 {
+            top: 50%;
+            left: 25%;
+            width: 15%;
+            height: 0;
+            transform: translateY(-50%);
+        }
+
+        .connection-2 {
+            top: 50%;
+            right: 25%;
+            width: 15%;
+            height: 0;
+            transform: translateY(-50%);
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .progress-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .progress-bar-container {
+            background: #f7fafc;
+            border-radius: 8px;
+            height: 12px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            transition: width 0.6s ease;
+        }
+
+        .progress-text {
+            font-size: 0.875rem;
+            color: #4a5568;
+            text-align: right;
+        }
+
+        /* Recent Activity */
+        .activity-section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .activity-text h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 2px;
+        }
+
+        .activity-text p {
+            font-size: 0.75rem;
+            color: #718096;
+        }
+
+        .activity-duration {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #1a202c;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .workflow-cards {
+                flex-direction: column;
+                gap: 24px;
+            }
+            
+            .workflow-connection {
+                display: none;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">🧘 Mindfulness</div>
+                <div class="nav-links">
+                    <a href="#" class="nav-link">Dashboard</a>
+                    <a href="#" class="nav-link">Sessions</a>
+                    <a href="#" class="nav-link">Progress</a>
+                    <a href="#" class="nav-link">Settings</a>
+                </div>
+                <div class="user-menu">
+                    <span style="font-size: 0.875rem; color: #4a5568;">Sarah Johnson</span>
+                    <div class="avatar">S</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section class="hero-section">
+                <h1 class="hero-title">Start your mindfulness journey <span style="font-size: 3.5rem; color: #ec4899; font-weight: 800;">TODAY</span></h1>
+                <p class="hero-subtitle">Track your meditation progress, practice breathing exercises, and find inner peace with our guided sessions.</p>
+                <button class="cta-button" onclick="startSession()">Begin Session</button>
+            </section>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">47</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">312</div>
+                    <div class="stat-label">Total Minutes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">23</div>
+                    <div class="stat-label">Sessions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">85%</div>
+                    <div class="stat-label">Weekly Goal</div>
+                </div>
+            </section>
+
+            <section class="workflow-section">
+                <div class="workflow-cards">
+                    <div class="workflow-card meditation" onclick="startMeditation()">
+                        <div class="workflow-icon">🧘‍♀️</div>
+                        <h3 class="workflow-title">Guided Meditation</h3>
+                        <p class="workflow-description">Start with mindfulness and focus sessions</p>
+                    </div>
+                    
+                    <div class="workflow-connection connection-1"></div>
+                    
+                    <div class="workflow-card breathing" onclick="startBreathing()">
+                        <div class="workflow-icon">🌬️</div>
+                        <h3 class="workflow-title">Breathing Exercise</h3>
+                        <p class="workflow-description">Practice 4-7-8 breathing technique</p>
+                    </div>
+                    
+                    <div class="workflow-connection connection-2"></div>
+                    
+                    <div class="workflow-card soundscape" onclick="startSoundscape()">
+                        <div class="workflow-icon">🎵</div>
+                        <h3 class="workflow-title">Nature Sounds</h3>
+                        <p class="workflow-description">Relax with calming soundscapes</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="progress-section">
+                <div class="progress-header">
+                    <h2 class="progress-title">Today's Progress</h2>
+                    <span style="color: #4a5568; font-size: 0.875rem;">12 of 15 minutes</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: 80%;"></div>
+                </div>
+                <div class="progress-text">80% complete</div>
+            </section>
+
+            <section class="activity-section">
+                <h2 style="font-size: 1.5rem; font-weight: 600; color: #1a202c; margin-bottom: 24px;">Recent Activity</h2>
+                
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-icon" style="background: #8b5cf6;">🧘‍♀️</div>
+                        <div class="activity-text">
+                            <h4>Morning Meditation</h4>
+                            <p>2 hours ago</p>
+                        </div>
+                    </div>
+                    <div class="activity-duration">12 min</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-icon" style="background: #0ea5e9;">🌬️</div>
+                        <div class="activity-text">
+                            <h4>Breathing Practice</h4>
+                            <p>4 hours ago</p>
+                        </div>
+                    </div>
+                    <div class="activity-duration">5 min</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-icon" style="background: #10b981;">🎵</div>
+                        <div class="activity-text">
+                            <h4>Forest Sounds</h4>
+                            <p>Yesterday</p>
+                        </div>
+                    </div>
+                    <div class="activity-duration">20 min</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-icon" style="background: #8b5cf6;">🧘‍♀️</div>
+                        <div class="activity-text">
+                            <h4>Evening Relaxation</h4>
+                            <p>Yesterday</p>
+                        </div>
+                    </div>
+                    <div class="activity-duration">15 min</div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <button class="fab" onclick="quickStart()">+</button>
+
+    <script>
+        function startSession() {
+            showToast("Starting your mindfulness session...");
+        }
+
+        function startMeditation() {
+            showToast("Loading guided meditation...");
+        }
+
+        function startBreathing() {
+            showToast("Preparing breathing exercise...");
+        }
+
+        function startSoundscape() {
+            showToast("Opening nature soundscapes...");
+        }
+
+        function quickStart() {
+            showToast("Quick session starting...");
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                right: 24px;
+                background: #1a202c;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 0.875rem;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+                transform: translateY(100px);
+                transition: transform 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.transform = 'translateY(0)';
+            }, 100);
+
+            setTimeout(() => {
+                toast.style.transform = 'translateY(100px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Animate progress bar on load
+        window.addEventListener('load', () => {
+            const progressBar = document.querySelector('.progress-bar');
+            setTimeout(() => {
+                progressBar.style.width = '80%';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
